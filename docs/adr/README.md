@@ -66,4 +66,4 @@ file is the contract every record follows and carries the index. The skeleton is
 
 | Number | Title | Area | Status |
 |---|---|---|---|
-| [1](1-madr-records.md) | MADR records | process | Implementing |
+| [1](1-madr-records.md) | MADR records | process | Implemented |
