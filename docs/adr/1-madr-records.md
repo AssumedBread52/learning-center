@@ -47,11 +47,11 @@ choice was right at the time.
 
 - *Format.* MADR, as laid out in `docs/adr/0-template.md`: context, considered
   options, outcome with consequences and reversal, pros and cons of every
-  option. Every record argues from its own drivers, never from earlier attempts;
-  considers *Do nothing* and says what it means in its context; states its
-  reversal cost; and names its dependents by number, since a changed decision
-  may reopen others (adopting GraphQL would reopen the choice of schema
-  contracts).
+  option. Every record is raised by forces inside the project, outside sources
+  only suggesting options; considers *Do nothing* and says what it means in its
+  context; states its reversal cost; and names its dependents by number, since a
+  changed decision may reopen others (adopting GraphQL would reopen the choice
+  of schema contracts).
 - *What gets a record.* Every exception to a standard and every tool choice,
   exceptions genuinely avoided first; a vendor's container image taken in place
   of a project-built one is the typical case. Feature records: one per
@@ -63,14 +63,12 @@ choice was right at the time.
   record enters the repository, never reused or renumbered; the file name pads
   it to the width of the highest number and is renamed at a power of ten; the
   title is a short noun phrase naming the option.
-- *Lifecycle.* Statuses *Draft* (outside the repository), *Implementing*,
-  *Implemented* (the Confirmation holds), *Superseded by ADR-N*; a removal
-  begins with a superseding record, so no *Deprecated*. Once merged, a changed
-  decision is a new record that supersedes the old, and only the status line,
-  `superseded_by`, links, and typos change in place; before the merge a draft or
-  branch is edited or deleted freely. A branch begins with the commit that adds
-  its record at *Implementing* and ends with the one that sets *Implemented*; no
-  tags, the status line doing what a tag would.
+- *Lifecycle.* Statuses *Implementing*, *Implemented*, and *Superseded by
+  ADR-N*. Once merged, a changed decision is a new record that supersedes the
+  old, and only the status line, `superseded_by`, links, and typos change in
+  place; before the merge a branch is edited or closed freely. A branch begins
+  with the commit that adds its record at *Implementing* and ends with the one
+  that sets *Implemented*; no tags, the status line doing what a tag would.
 - *Agreements become decisions or conventions.* A record when the agreement
   chooses an architecture, a tool, or an exception with alternatives worth
   recording; otherwise a convention, linted if it can.
@@ -140,5 +138,5 @@ the index.
 
 Sources: the brainstorming notes (*Evolutionary architecture* and the agreements
 log). Agreed 2026-10-03; feature records, carried-over artifacts, and the
-tooling on 2026-10-09; the tooling's separate records on 2026-10-14; records
-standing on their own merits on 2026-10-20.
+tooling on 2026-10-09; the tooling's separate records on 2026-10-14; internal
+forces deciding, outside sources inspiring, on 2026-10-20.
