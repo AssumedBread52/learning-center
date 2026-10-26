@@ -1,6 +1,6 @@
 ---
 title: Git on GitHub
-status: Implementing
+status: Implemented
 date: 2026-10-05
 area: repository
 trigger: none
