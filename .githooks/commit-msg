@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Checks a commit message against the header form of ADR-3: one header
+# line only, an identifier ADR-N (N unpadded and positive), a colon and a
+# space, and a description that does not end in a period, all within 72
+# columns so that git log and GitHub show it whole at 80. Bodies and
+# footers are rejected until this hook checks them, since what is
+# unchecked is not a convention. Messages git writes itself ("Merge ...")
+# pass untouched. Bash and coreutils only; git calls it with the message
+# file as the argument.
+set -euo pipefail
+
+readonly HEADER='^ADR-[1-9][0-9]*: [^ ].*[^. ]$'
+readonly MAX_HEADER=72
+
+# Prints the message's lines with git's comment lines removed.
+message_lines() {
+  grep -v '^#' "$1" || true
+}
+
+# Prints the reason a header is rejected, or nothing when it passes.
+header_problem() {
+  local header=$1
+  if [ "${#header}" -gt "$MAX_HEADER" ]; then
+    echo "header is ${#header} columns; the limit is ${MAX_HEADER}"
+  elif ! [[ "$header" =~ $HEADER ]]; then
+    echo "header is not 'ADR-N: description'"
+  fi
+}
+
+main() {
+  local file=$1 header rest problem
+  header=$(message_lines "$file" | sed -n '1p')
+  rest=$(message_lines "$file" | sed -n '2,$p' | grep -c . || true)
+  case "$header" in 'Merge '*) exit 0 ;; esac
+  problem=$(header_problem "$header")
+  if [ -z "$problem" ] && [ "$rest" -gt 0 ]; then
+    problem='the message is one header line; bodies and footers are not checked yet'
+  fi
+  if [ -n "$problem" ]; then
+    echo "commit-msg: ${problem}" >&2
+    echo "  got: ${header}" >&2
+    echo '  see docs/adr/3-trunk-based-development.md' >&2
+    exit 1
+  fi
+}
+
+main "$@"
