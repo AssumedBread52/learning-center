@@ -51,16 +51,24 @@ while keeping one version of each tool in one place.
   two), never an `alpine` variant. A vendor-namespaced image, such as
   `grafana/grafana:11.2.0` or the browser-testing image, is accepted when
   no exactly tagged official image exists.
-- *The image tag is the version manager.* Each version lives in one `.env`
-  variable (`NODE_IMAGE=node:24.21.0`) referenced by every service and
-  utility container that uses it, and mirrored in `package.json`'s
-  `engines` field once there is one; the Compose variable drives.
+- *The image tag is the version manager, and it is committed.* A version
+  is a decision of the project, not of a clone, so each is written once,
+  as an anchor in the `x-images` block at the top of the Compose file
+  (`node: &node-image node:24.21.0`) that every service and utility
+  container using it references, and mirrored in `package.json`'s
+  `engines` field once there is one; the Compose file drives. A bump
+  reaches every clone on its next pull, and no clone can change it
+  without a diff.
 - *Bind-mounted files are owned by the host user.* Containers that write
-  to the bind mount run as `user: "${USER_ID}:${GROUP_ID}"`;
-  `scripts/up.sh` writes the git-ignored `.env` from `id -u` and `id -g`,
-  and is the only template for it, so no `.env.example` is committed.
-  Service state lives in named volumes under the image's own user, and the
-  Compose file says so where the service is declared.
+  to the bind mount run as `user: "${USER_ID}:${GROUP_ID}"`. The
+  git-ignored `.env` holds only facts about the host and the clone, and
+  `scripts/up.sh` is its only template, so no `.env.example` is committed.
+  The script adds a missing key and checks a present one: a uid or gid
+  other than `id -u` and `id -g` stops it, naming the line to delete,
+  because files would land owned by someone else, while a changed project
+  name is kept as a deliberate override. Service state lives in named
+  volumes under the image's own user, and the Compose file says so where
+  the service is declared.
 - *Utility containers for tooling.* Package managers and other tools run as
   one-off containers sharing the image, user, and bind mount of what they
   serve, under a `tools` profile that `up` ignores. A uid the image does
@@ -134,4 +142,5 @@ listed inline. Review until then.
 Sources: the brainstorming notes (*Toolchain in containers only*, *Tech
 stack and tooling*, and the agreement *No software installed on the host*).
 Agreed 2026-10-03; no `.env.example`, since the script is the template,
-2026-10-16.
+2026-10-16; the version committed rather than kept in `.env`, and the uid
+and gid checked, 2026-10-28.
