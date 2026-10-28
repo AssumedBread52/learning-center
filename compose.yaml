@@ -1,0 +1,23 @@
+# The Compose file both worktrees share (ADR-4). Until the application
+# has services, the one service is the node utility under the tools
+# profile, which up ignores and run uses. Its variables come from the
+# git-ignored .env that scripts/up.sh writes. The volume covers /home/node
+# whole because Docker gives a fresh volume the ownership of the image
+# directory it covers, and /home/node belongs to uid 1000 in the node
+# image, while a path absent from the image comes up owned by root.
+services:
+  node:
+    profiles: ["tools"]
+    image: ${NODE_IMAGE:?run scripts/up.sh}
+    user: "${USER_ID:?run scripts/up.sh}:${GROUP_ID:?run scripts/up.sh}"
+    working_dir: /app
+    entrypoint: node
+    environment:
+      HOME: /home/node
+      NPM_CONFIG_CACHE: /home/node/.npm
+    volumes:
+      - .:/app
+      - node-home:/home/node
+
+volumes:
+  node-home:
