@@ -69,3 +69,4 @@ file is the contract every record follows and carries the index. The skeleton is
 | [1](1-madr-records.md) | MADR records | process | Implemented |
 | [2](2-git-on-github.md) | Git on GitHub | repository | Implemented |
 | [3](3-trunk-based-development.md) | Trunk-based development | process | Implemented |
+| [4](4-containers-only.md) | Containers only | toolchain | Implementing |
