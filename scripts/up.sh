@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Brings the stack up (ADR-4): ensures on the host what Compose needs
 # before it can parse compose.yaml, then runs docker compose up. Each
-# ensured item follows one rule: missing, generate it; present and
-# valid, leave it; never destroy. Today that is the git-ignored .env,
-# for which this script is the template, and core.hooksPath (ADR-3).
-# Bash, coreutils, git, and docker only. NODE_IMAGE defaults to the tag
-# current on 2026-10-03; a bump edits this default and each clone's .env.
+# ensured item follows one rule: missing, generate it; present, leave
+# it, stopping only when a value that must match the host does not;
+# never destroy. Today that is the git-ignored .env, for which this
+# script is the template, and core.hooksPath (ADR-3). Image versions
+# are not among them: they are committed in compose.yaml. Bash,
+# coreutils, git, and docker only.
 set -euo pipefail
 
-NODE_IMAGE_DEFAULT='node:24.21.0'
 HOOKS_DIRECTORY='.githooks'
 
 # Prints how to call the script and what it writes.
@@ -18,11 +18,11 @@ Usage: scripts/up.sh [--help] [--no-up] [docker compose up options]
 
 Ensures <repository>/.env has these keys, adding only missing ones:
   USER_ID, GROUP_ID     from id -u and id -g, so bind-mounted files
-                        belong to you
-  NODE_IMAGE            ${NODE_IMAGE_DEFAULT}
+                        belong to you; another value stops the script
   COMPOSE_PROJECT_NAME  learning-center- plus the directory's name, so
                         production/ and development/ run side by side
-Inside a git repository it also sets core.hooksPath to ${HOOKS_DIRECTORY}.
+Inside a git repository it also sets core.hooksPath to ${HOOKS_DIRECTORY}
+when unset, and warns when it is set to something else.
 Then runs docker compose up --pull missing with the remaining options,
 unless --no-up. Safe to run any number of times.
 USAGE
@@ -69,14 +69,39 @@ ensure_key() {
   echo "added ${key}=${value}"
 }
 
-# Sets core.hooksPath only when the root is the top of a git work tree,
-# so a copy sitting inside another repository leaves it untouched.
+# Like ensure_key, for a key whose value is a fact about the host: a
+# line with another value stops the script, since files would land owned
+# by someone else, and the message names the line to delete.
+ensure_host_key() {
+  local file=$1 key=$2 value=$3 line
+  line=$(grep -m 1 "^${key}=" "$file" || true)
+  if [ -n "$line" ] && [ "$line" != "${key}=${value}" ]; then
+    echo "${file}: ${line} is not this host's ${value};" \
+      'delete the line and rerun' >&2
+    exit 1
+  fi
+  ensure_key "$file" "$key" "$value"
+}
+
+# Sets core.hooksPath only when the root is the top of a git work tree
+# and the path is unset, so a copy sitting inside another repository and
+# a path the developer chose are left untouched.
 configure_hooks() {
-  local root=$1 top
+  local root=$1 top current
   top=$(git -C "$root" rev-parse --show-toplevel 2> /dev/null || true)
   if [ "$top" != "$root" ]; then
     echo 'not a git repository root: core.hooksPath left unset;' \
       'rerun after cloning'
+    return
+  fi
+  current=$(git -C "$root" config --get core.hooksPath || true)
+  if [ "$current" = "$HOOKS_DIRECTORY" ]; then
+    echo "kept  core.hooksPath=${HOOKS_DIRECTORY}"
+    return
+  fi
+  if [ -n "$current" ]; then
+    echo "warn  core.hooksPath=${current} left as set; the hooks in" \
+      "${HOOKS_DIRECTORY} (ADR-3) will not run" >&2
     return
   fi
   git -C "$root" config core.hooksPath "$HOOKS_DIRECTORY"
@@ -106,9 +131,8 @@ main() {
   root=$(repository_root)
   env_file="${root}/.env"
   ensure_file "$env_file"
-  ensure_key "$env_file" USER_ID "$(id -u)"
-  ensure_key "$env_file" GROUP_ID "$(id -g)"
-  ensure_key "$env_file" NODE_IMAGE "$NODE_IMAGE_DEFAULT"
+  ensure_host_key "$env_file" USER_ID "$(id -u)"
+  ensure_host_key "$env_file" GROUP_ID "$(id -g)"
   ensure_key "$env_file" COMPOSE_PROJECT_NAME "$(project_name "$root")"
   configure_hooks "$root"
   if [ "$up" = true ]; then bring_up "$root" "$@"; fi
