@@ -1,6 +1,6 @@
 ---
 title: Containers only
-status: Implementing
+status: Implemented
 date: 2026-10-03
 area: toolchain
 trigger: none
