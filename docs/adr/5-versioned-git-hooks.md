@@ -43,22 +43,26 @@ it exists, with nothing installed on the host?
 Chosen option: 1, *plain scripts in a versioned `.githooks/`*, because it
 is the only option that runs before the commit while installing nothing.
 
-- *Where hooks live.* Each hook is a bash script in `.githooks/`, using
-  bash, git, coreutils, and docker only; `scripts/up.sh` sets
-  `core.hooksPath` to the directory, so a clone has every hook once it
-  has been brought up.
+- *Where hooks live.* Each hook is a bash script in `.githooks/`;
+  `scripts/up.sh` sets `core.hooksPath` to the directory, so a clone has
+  every hook once it has been brought up.
+- *What a script on the host may use:* bash, git, docker, and the POSIX
+  utilities with their POSIX options only, so the scripts run wherever
+  those exist; anything else runs in a container.
 - *`commit-msg`* checks the header against the commit rules.
-- *`pre-commit`* runs every fast check through `docker compose run` and
-  refuses the commit when one fails, naming it. It starts with the record
-  validator, run on the working tree's `docs/adr`, with its tests, and the
-  image check: no `Dockerfile`, `*.Dockerfile`, or `Containerfile`, and
-  every image `docker compose config --images` resolves names an exact
-  tag, never bare, `latest`, a floating major, or `-alpine`.
-- *Adding a check needs no record of its own.* A record that brings a tool
-  adds the tool's check to a hook on its own branch; a check using tools
-  already decided is an ordinary commit.
-- *The checks' own tests* run on Node's built-in test runner, which ships
-  in the pinned image, until a test-tooling record decides otherwise.
+- *`pre-commit`* runs every script in `scripts/checks/` in name order,
+  reports every one that fails, and refuses the commit if any did. Each
+  check decides where it runs, on the host or through `docker compose
+  run`. The first checks are the record validator, run on the working
+  tree's `docs/adr`, and the image check: no `Dockerfile`, `*.Dockerfile`,
+  or `Containerfile`, and every image `docker compose config --images`
+  resolves names an exact tag, never bare, `latest`, a floating major, or
+  `-alpine`. Their tests sit beside them as checks too, so a failing test
+  refuses a commit like any other failure.
+- *Adding a check needs no record of its own:* it is a file in
+  `scripts/checks/`, and the hook never changes. A record that brings a
+  tool adds the tool's check on its own branch; a check using tools already
+  decided is an ordinary commit.
 - *A time budget.* The hook stays fast enough that skipping it is never
   tempting; its number is set once there is a test suite to measure, and
   until then review watches the hook's duration.
@@ -70,9 +74,9 @@ is the only option that runs before the commit while installing nothing.
 - *Good:* releasability and the record contract are enforced at the
   moment of commit, and a fresh clone has the hooks after one script.
 - *Good:* a hook is a file in the repository, reviewed like any other.
-- *Bad:* every commit waits for its checks, one to two seconds per
-  `docker compose run`; batching steps into one container start is the
-  first remedy when the budget tightens.
+- *Bad:* every commit waits for its checks, one to two seconds for each
+  that runs in a container; checks on the host and batched container
+  starts are the first remedies when the budget tightens.
 - *Bad:* hooks run on the client: `--no-verify`, a clone never brought up,
   and a commit made elsewhere all skip them, which a hosted check closes.
 
@@ -81,12 +85,14 @@ is the only option that runs before the commit while installing nothing.
 Cheap mechanically: delete the scripts and unset `core.hooksPath`. Costly
 in what rests on it: ADR-3's header rule and ADR-4's image check lose
 their enforcement and become review items again. Builds on ADR-4, whose
-containers run every check and whose bootstrap script sets the hooks path.
+containers run the checks that need tools and whose bootstrap script sets
+the hooks path.
 
 ### Confirmation
 
 The hooks confirm themselves: a commit whose header or fast check fails is
-refused, and the refusal names the failing check.
+refused, and the refusal names the failing check. Whether a script keeps to
+POSIX utilities and options is a review item, since no check sees it.
 
 ## Pros and cons of the options
 
