@@ -70,3 +70,4 @@ file is the contract every record follows and carries the index. The skeleton is
 | [2](2-git-on-github.md) | Git on GitHub | repository | Implemented |
 | [3](3-trunk-based-development.md) | Trunk-based development | process | Implemented |
 | [4](4-containers-only.md) | Containers only | toolchain | Implemented |
+| [5](5-versioned-git-hooks.md) | Versioned git hooks | process | Implementing |
