@@ -40,6 +40,27 @@ field() {
   printf 's|^%s: .*|%s: %s|' "$1" "$1" "$2"
 }
 
+# Prints a line of the given width, prefixed.
+wide() {
+  local line=$1
+  while [ "${#line}" -lt "$2" ]; do line="${line}w"; done
+  printf '%s' "$line"
+}
+
+# Prints a sed script appending each argument as a line at the end.
+append() {
+  local line script='$a\'
+  for line in "$@"; do script="${script}"$'\n'"${line}\\"; done
+  printf '%s' "${script%\\}"
+}
+
+# Prints one word per line from line 12, after the valid record, to the
+# given line number.
+filler() {
+  local line
+  for ((line = 12; line <= $1; line++)); do echo x; done
+}
+
 expect_clean() {
   local name=$1 edit=$2 output
   if output=$(run_edited "$edit" 2>&1); then return; fi
@@ -96,5 +117,17 @@ expect_finding 'a padded supersedes' "$(field supersedes ADR-02)" \
   'supersedes "ADR-02"'
 expect_finding 'a bare superseded_by' "$(field superseded_by 2)" \
   'superseded_by "2"'
+
+expect_clean 'prose exactly 80 columns' "$(append "$(wide '' 80)")"
+expect_finding 'prose wider than 80 columns' "$(append "$(wide '' 81)")" \
+  '12: 81 columns; prose wraps at 80'
+expect_clean 'a wide heading' "$(append "$(wide '## ' 90)")"
+expect_clean 'a wide table row' "$(append "$(wide '| ' 90)")"
+expect_clean 'a wide line carrying a URL' \
+  "$(append "$(wide 'See https://example.test/' 90)")"
+expect_clean 'a wide title' "$(field title "$(wide '' 90)")"
+expect_clean 'exactly 150 lines' "$(append $(filler 150))"
+expect_finding 'more than 150 lines' "$(append $(filler 151))" \
+  '151: 151 lines; the ceiling is 150'
 
 if [ "$failures" -gt 0 ]; then exit 1; fi
