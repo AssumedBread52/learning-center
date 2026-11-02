@@ -3,11 +3,11 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/testing.sh"
 
-# Prints one word per line from line 12, after the valid record, to the
-# given line number.
+# Prints one word per line from the first line after the valid record to
+# the given line number.
 filler() {
   local line
-  for ((line = 12; line <= $1; line++)); do echo x; done
+  for ((line = appended; line <= $1; line++)); do echo x; done
 }
 
 expect_clean 'exactly 150 lines' "$(append $(filler 150))"

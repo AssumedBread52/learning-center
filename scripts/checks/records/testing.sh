@@ -21,8 +21,42 @@ superseded_by: none
 ---
 
 # ADR-1: Do one thing
+
+## Context and problem statement
+
+Should the project do one thing?
+
+## Considered options
+
+1. One thing.
+2. Do nothing: keep things as they are.
+
+## Decision outcome
+
+Chosen option: 1, *one thing*, because it is enough.
+
+### Consequences
+
+- Good: one thing is done.
+
+### Reversal
+
+Cheap; no records depend on it.
+
+## Pros and cons of the options
+
+### Option 1: One thing
+
+- Good: it is enough.
+
+### Option 2: Do nothing
+
+- Bad: nothing is done.
 RECORD
 }
+
+# The number of the first line appended after the valid record.
+appended=$(($(valid_record | wc -l) + 1))
 
 # Writes the valid record edited by the sed script, and a valid record 2
 # after it, then runs records.sh on both; prints the findings and returns

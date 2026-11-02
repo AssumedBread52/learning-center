@@ -12,7 +12,7 @@ wide() {
 
 expect_clean 'prose exactly 80 columns' "$(append "$(wide '' 80)")"
 expect_finding 'prose wider than 80 columns' "$(append "$(wide '' 81)")" \
-  '12: 81 columns; prose wraps at 80'
+  "${appended}: 81 columns; prose wraps at 80"
 expect_clean 'a wide heading' "$(append "$(wide '## ' 90)")"
 expect_clean 'a wide table row' "$(append "$(wide '| ' 90)")"
 expect_clean 'a wide line carrying a URL' \
