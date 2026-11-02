@@ -73,6 +73,12 @@ field() {
   printf 's|^%s: .*|%s: %s|' "$1" "$1" "$2"
 }
 
+# Prints a sed script setting the title in the front matter and the heading.
+title() {
+  printf '%s; s|^# ADR-\\([0-9]*\\): .*|# ADR-\\1: %s|' \
+    "$(field title "$1")" "$1"
+}
+
 # Prints a sed script appending each argument as a line at the end.
 append() {
   local line script='$a\'

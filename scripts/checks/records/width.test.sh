@@ -17,6 +17,6 @@ expect_clean 'a wide heading' "$(append "$(wide '## ' 90)")"
 expect_clean 'a wide table row' "$(append "$(wide '| ' 90)")"
 expect_clean 'a wide line carrying a URL' \
   "$(append "$(wide 'See https://example.test/' 90)")"
-expect_clean 'a wide title' "$(field title "$(wide '' 90)")"
+expect_clean 'a wide title' "$(title "$(wide '' 90)")"
 
 finish
