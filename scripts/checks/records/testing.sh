@@ -58,14 +58,34 @@ RECORD
 # The number of the first line appended after the valid record.
 appended=$(($(valid_record | wc -l) + 1))
 
+# Prints the value of the front matter field in the record, its first
+# occurrence only.
+value() {
+  sed -n "/^$1: /{s///p;q;}" "$2"
+}
+
+# Prints the index the records written to the fixtures call for.
+index_of() {
+  local record name
+  printf '## Index\n\n| Number | Title | Area | Status |\n|---|---|---|---|\n'
+  for record in "$fixtures"/[1-9]*.md; do
+    name=${record##*/}
+    printf '| [%s](%s) | %s | %s | %s |\n' "${name%%-*}" "$name" \
+      "$(value title "$record")" "$(value area "$record")" \
+      "$(value status "$record")"
+  done
+}
+
 # Writes the valid record edited by the sed script, and a valid record 2
-# after it, edited by the sed script in $second when set, then runs
-# records.sh on both; prints the findings and returns the exit status.
+# after it, edited by the sed script in $second when set, and the index
+# they call for, edited by the sed script in $readme when set; then runs
+# records.sh on them, prints the findings, and returns the exit status.
 run_edited() {
   rm -rf "$fixtures" && mkdir -p "$fixtures"
   valid_record | sed -e "$1" > "$fixtures/1-do-one-thing.md"
   valid_record | sed -e 's/ADR-1:/ADR-2:/' -e "${second:-}" \
     > "$fixtures/2-do-one-thing.md"
+  index_of | sed -e "${readme:-}" > "$fixtures/README.md"
   bash "$checks/records.sh" "$fixtures"
 }
 
