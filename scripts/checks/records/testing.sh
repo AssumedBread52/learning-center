@@ -59,12 +59,13 @@ RECORD
 appended=$(($(valid_record | wc -l) + 1))
 
 # Writes the valid record edited by the sed script, and a valid record 2
-# after it, then runs records.sh on both; prints the findings and returns
-# the exit status.
+# after it, edited by the sed script in $second when set, then runs
+# records.sh on both; prints the findings and returns the exit status.
 run_edited() {
   rm -rf "$fixtures" && mkdir -p "$fixtures"
   valid_record | sed -e "$1" > "$fixtures/1-do-one-thing.md"
-  valid_record | sed -e 's/ADR-1:/ADR-2:/' > "$fixtures/2-do-one-thing.md"
+  valid_record | sed -e 's/ADR-1:/ADR-2:/' -e "${second:-}" \
+    > "$fixtures/2-do-one-thing.md"
   bash "$checks/records.sh" "$fixtures"
 }
 
