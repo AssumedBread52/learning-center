@@ -1,7 +1,7 @@
 ---
 title: Git on GitHub
 status: Implemented
-date: 2026-10-05
+date: 2026-10-26
 area: repository
 trigger: none
 supersedes: none
