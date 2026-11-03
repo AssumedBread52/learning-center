@@ -33,15 +33,17 @@ index_of() {
   done
 }
 
-# Writes the valid record edited by the sed script, and a valid record 2
-# after it, edited by the sed script in $second when set, and the index
-# they call for, edited by the sed script in $readme when set; then runs
-# records.sh on them, prints the findings, and returns the exit status.
+# Writes the valid record edited by the sed script, a valid record 2 after
+# it, edited by the sed script in $second when set, the valid record again
+# under the file name in $third when set, and the index they call for,
+# edited by the sed script in $readme when set; then runs records.sh on
+# them, prints the findings, and returns the exit status.
 run_edited() {
   rm -rf "$fixtures" && mkdir -p "$fixtures"
   valid_record | sed -e "$1" > "$fixtures/1-do-one-thing.md"
   valid_record | sed -e 's/ADR-1:/ADR-2:/' -e "${second:-}" \
     > "$fixtures/2-do-one-thing.md"
+  if [ -n "${third:-}" ]; then valid_record > "$fixtures/$third"; fi
   index_of | sed -e "${readme:-}" > "$fixtures/README.md"
   bash "$checks/records.sh" "$fixtures"
 }
