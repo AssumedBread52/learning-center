@@ -126,3 +126,7 @@ as running checks only on staged files.
 
 Agreed 2026-10-08 as the local half of a two-tier gate; named for its
 mechanism on 2026-10-29, with the hosted check a record of its own.
+
+Open point: the checks read the working tree, so an unstaged fix can hide
+a staged error, and a check not yet staged runs on a commit that lacks it.
+Reading the index instead waits for the first such error to reach a commit.

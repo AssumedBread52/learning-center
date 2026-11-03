@@ -57,10 +57,17 @@ file is the contract every record follows and carries the index. The skeleton is
 - **Width.** Prose wraps at 80 columns, the width code follows, so one editor
   ruler serves both. Heading lines, the front-matter title, table rows, and URLs
   are exempt, since they cannot wrap.
-- **Validation.** The index below is maintained by hand in the shape shown, one
-  row per record in number order, until a validator in the build gate checks
-  every record against this contract and regenerates the index from front
-  matter.
+- **Validation.** The pre-commit hook (ADR-5) refuses a commit whose records
+  break the front-matter, width, or length rules, carry a heading that differs
+  from their number and title, lack a required section in order or a *Do
+  nothing* option, or share a number, or whose index below differs from the
+  rows their front matter calls for. The index is written by hand in the shape
+  shown, one row per record in number order. Deferred, each until its trigger:
+  file-name padding and regenerating the index, at the tenth record, whose
+  renames rewrite every row; supersession pairs agreeing, at the first
+  superseded record; citations resolving and unpadded, at the first wrong one;
+  impossible calendar dates, at the first one; empty sections, misplaced or
+  unknown headings, and option numbering, each at its first occurrence.
 
 ## Index
 
