@@ -55,10 +55,13 @@ is the only option that runs before the commit while installing nothing.
   check decides where it runs, on the host or through `docker compose
   run`. The first checks are the record validator, run on the working
   tree's `docs/adr`, and the image check: no `Dockerfile`, `*.Dockerfile`,
-  or `Containerfile`, and every image `docker compose config --images`
-  resolves names an exact tag, never bare, `latest`, a floating major, or
-  `-alpine`. Their tests sit beside them as checks too, so a failing test
-  refuses a commit like any other failure.
+  or `Containerfile` among the files git tracks, and at least one image,
+  each image that `docker compose --profile '*' config --images` resolves
+  with placeholder user ids, named by a `MAJOR.MINOR.PATCH` tag and nothing
+  else. Every profile, because a profiled service is otherwise skipped; an
+  image that needs another form gets an inline exception when it arrives.
+  Their tests sit beside them as checks too, so a failing test refuses a
+  commit like any other failure.
 - *Adding a check needs no record of its own:* it is a file in
   `scripts/checks/`, and the hook never changes. A record that brings a
   tool adds the tool's check on its own branch; a check using tools already
