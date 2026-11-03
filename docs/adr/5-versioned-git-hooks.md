@@ -1,6 +1,6 @@
 ---
 title: Versioned git hooks
-status: Implementing
+status: Implemented
 date: 2026-10-29
 area: process
 trigger: none
