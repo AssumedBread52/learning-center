@@ -63,8 +63,9 @@ file is the contract every record follows and carries the index. The skeleton is
   break the front-matter, width, or length rules, carry a heading that differs
   from their number and title, lack a required section in order or a *Do
   nothing* option, or share a number, or whose index below differs from the
-  rows their front matter calls for. The index is written by hand in the shape
-  shown, one row per record in number order. Deferred, each until its trigger:
+  rows their front matter calls for, or that adds a record dated other than the
+  day of the commit. The index is written by hand in the shape shown, one row
+  per record in number order. Deferred, each until its trigger:
   file-name padding and regenerating the index, at the tenth record, whose
   renames rewrite every row; supersession pairs agreeing, at the first
   superseded record; citations resolving and unpadded, at the first wrong one;
