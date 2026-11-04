@@ -62,7 +62,7 @@ ensure_file() {
 ensure_key() {
   local file=$1 key=$2 value=$3
   if grep -q "^${key}=" "$file"; then
-    echo "kept  $(grep -m 1 "^${key}=" "$file")"
+    echo "kept  $(sed -n "/^${key}=/{p;q;}" "$file")"
     return
   fi
   printf '%s=%s\n' "$key" "$value" >> "$file"
@@ -74,7 +74,7 @@ ensure_key() {
 # by someone else, and the message names the line to delete.
 ensure_host_key() {
   local file=$1 key=$2 value=$3 line
-  line=$(grep -m 1 "^${key}=" "$file" || true)
+  line=$(sed -n "/^${key}=/{p;q;}" "$file")
   if [ -n "$line" ] && [ "$line" != "${key}=${value}" ]; then
     echo "${file}: ${line} is not this host's ${value};" \
       'delete the line and rerun' >&2
