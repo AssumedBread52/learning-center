@@ -5,7 +5,7 @@
 # columns so that git log and GitHub show it whole at 80. Bodies and
 # footers are rejected until this hook checks them, since what is
 # unchecked is not a convention. Messages git writes itself ("Merge ...")
-# pass untouched. Bash and coreutils only; git calls it with the message
+# pass untouched. Bash and the POSIX utilities only; git calls it with the
 # file as the argument.
 set -euo pipefail
 
