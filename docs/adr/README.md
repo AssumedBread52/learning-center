@@ -28,10 +28,11 @@ file is the contract every record follows and carries the index. The skeleton is
 - **Records are immutable once merged into `main`.** A changed decision is then
   a new record that supersedes the old one; the old record's status becomes
   *Superseded by ADR-N* and keeps saying why the earlier choice was right at the
-  time. Only the status line, `superseded_by`, links, typos, and a `date` that
-  differs from the entry day may be edited in place. Before the merge anything
-  goes: a record is edited freely on its branch, and a branch whose decision
-  proves wrong is closed unmerged; the next record to enter takes the number.
+  time. Only the status line, `superseded_by`, links, typos, slips whose
+  correction leaves the outcome reading the same, and a `date` that differs
+  from the entry day may be edited in place. Before the merge anything goes: a
+  record is edited freely on its branch, and a branch whose decision proves
+  wrong is closed unmerged; the next record to enter takes the number.
 - **Statuses.** *Implementing*: the feature branch that added the record is
   implementing it. *Implemented*: the work the record calls for is complete, set
   by the last commit on its branch. *Superseded by ADR-N*. Nothing else.
