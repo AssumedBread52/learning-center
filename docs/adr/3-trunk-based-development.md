@@ -1,7 +1,7 @@
 ---
 title: Trunk-based development
 status: Implemented
-date: 2026-10-03
+date: 2026-10-27
 area: process
 trigger: none
 supersedes: none

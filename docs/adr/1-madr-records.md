@@ -1,7 +1,7 @@
 ---
 title: MADR records
 status: Implemented
-date: 2026-10-03
+date: 2026-10-20
 area: process
 trigger: none
 supersedes: none

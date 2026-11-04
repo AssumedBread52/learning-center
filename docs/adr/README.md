@@ -14,6 +14,8 @@ file is the contract every record follows and carries the index. The skeleton is
   every area, assigned when the record enters the repository, in merge order,
   never reused and never renumbered: prose, commit messages, and `supersedes`
   fields cite it.
+- **Date.** The `date` is the day of the commit that adds the record to the
+  repository, not the day its decision was first discussed.
 - **Naming.** The file is `N-<kebab-title>.md` with the number padded to the
   width of the highest number present; when the count crosses a power of ten the
   files are renamed to the new width and the index regenerated, and no
@@ -26,10 +28,10 @@ file is the contract every record follows and carries the index. The skeleton is
 - **Records are immutable once merged into `main`.** A changed decision is then
   a new record that supersedes the old one; the old record's status becomes
   *Superseded by ADR-N* and keeps saying why the earlier choice was right at the
-  time. Only the status line, `superseded_by`, links, and typos may be edited in
-  place. Before the merge anything goes: a record is edited freely on its
-  branch, and a branch whose decision proves wrong is closed unmerged; the next
-  record to enter takes the number.
+  time. Only the status line, `superseded_by`, links, typos, and a `date` that
+  differs from the entry day may be edited in place. Before the merge anything
+  goes: a record is edited freely on its branch, and a branch whose decision
+  proves wrong is closed unmerged; the next record to enter takes the number.
 - **Statuses.** *Implementing*: the feature branch that added the record is
   implementing it. *Implemented*: the work the record calls for is complete, set
   by the last commit on its branch. *Superseded by ADR-N*. Nothing else.
@@ -61,8 +63,9 @@ file is the contract every record follows and carries the index. The skeleton is
   break the front-matter, width, or length rules, carry a heading that differs
   from their number and title, lack a required section in order or a *Do
   nothing* option, or share a number, or whose index below differs from the
-  rows their front matter calls for. The index is written by hand in the shape
-  shown, one row per record in number order. Deferred, each until its trigger:
+  rows their front matter calls for, or that adds a record dated other than the
+  day of the commit. The index is written by hand in the shape shown, one row
+  per record in number order. Deferred, each until its trigger:
   file-name padding and regenerating the index, at the tenth record, whose
   renames rewrite every row; supersession pairs agreeing, at the first
   superseded record; citations resolving and unpadded, at the first wrong one;
