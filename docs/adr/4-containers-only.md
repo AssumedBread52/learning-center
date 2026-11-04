@@ -45,7 +45,7 @@ while keeping one version of each tool in one place.
 - *Host prerequisites, and nothing else:* Docker with Compose, git, and a
   shell. The rule is about installing: tools the operating system already
   ships (`python3`, `sed`, `awk`) are fair game, and hook scripts stay
-  within bash, git, and coreutils.
+  within bash, git, and the POSIX utilities.
 - *No Dockerfiles, images as published,* named by the software and an exact
   tag (`node:24.21.0`, `postgres:18.6`; two numbers where the software uses
   two), never an `alpine` variant. A vendor-namespaced image, such as

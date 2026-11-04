@@ -6,7 +6,7 @@
 # never destroy. Today that is the git-ignored .env, for which this
 # script is the template, and core.hooksPath (ADR-3). Image versions
 # are not among them: they are committed in compose.yaml. Bash,
-# coreutils, git, and docker only.
+# the POSIX utilities, git, and docker only.
 set -euo pipefail
 
 HOOKS_DIRECTORY='.githooks'
