@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Runs every check in scripts/checks/ of a repository, the current one by
 # default, in name order and all of them even after one fails: the one list
-# the pre-commit hook (ADR-5) and the hosted check (ADR-6) both run. Names
-# the failing checks and exits 1 when any failed.
+# the pre-commit hook (ADR-5) and the hosted check (ADR-6) both run. The
+# hosted check sets CHECK_RANGE=BASE..HEAD to the commits under check, and
+# the checks inherit it. Names the failing checks and exits 1 when any
+# failed.
 set -uo pipefail
 
 main() {
