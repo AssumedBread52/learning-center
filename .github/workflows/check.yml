@@ -1,0 +1,30 @@
+# The hosted check (ADR-6): on every pull request into main, the checks the
+# pre-commit hook runs, over the commits the pull request brings, and the
+# header of each of those commits. Branch protection requires the job.
+name: check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BASE: ${{ github.event.pull_request.base.sha }}
+      HEAD: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Write the .env a fresh clone gets
+        run: bash scripts/up.sh --no-up
+      - name: Run every check over the pull request's commits
+        run: CHECK_RANGE="${BASE}..${HEAD}" bash scripts/check.sh
+      - name: Check the header of every commit
+        run: bash scripts/headers.sh "$BASE" "$HEAD"

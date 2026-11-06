@@ -26,17 +26,20 @@ write_record() {
 }
 
 # Writes a fresh repository, then runs each argument as a shell command in
-# it, with write_record and git at hand; then runs entry-dates.sh on it,
-# prints the findings, and returns the exit status.
+# it, with write_record, commit_all, and git at hand; then runs
+# entry-dates.sh on it with CHECK_RANGE set to $range, prints the findings,
+# and returns the exit status.
 run_with() {
   local step
   rm -rf "$fixtures" && mkdir -p "$fixtures" && git -C "$fixtures" init -q
   for step in "$@"; do (cd "$fixtures" && eval "$step"); done
-  bash "$checks/entry-dates.sh" "$fixtures"
+  CHECK_RANGE=${range:-} bash "$checks/entry-dates.sh" "$fixtures"
 }
 
+# Commits everything, authored on the day $1 when given.
 commit_all() {
-  git add -A && git -c user.name=t -c user.email=t@t commit -q -m 'ADR-1: x'
+  git add -A && GIT_AUTHOR_DATE=${1:+"$1T12:00:00+0000"} \
+    git -c user.name=t -c user.email=t@t commit -q --allow-empty -m 'ADR-1: x'
 }
 
 expect_clean() {
@@ -79,5 +82,22 @@ expect_clean 'the index' 'mkdir -p docs/adr && echo x > docs/adr/README.md' \
   'git add -A'
 expect_clean 'a dated file outside docs/adr' \
   "write_record 1-a.md 2000-01-01 && mv docs/adr/1-a.md . && git add -A"
+
+start='commit_all 2001-02-01 && git tag base'
+range=base..HEAD expect_clean 'a record added in the range on its day' \
+  "$start" 'write_record 1-a.md 2001-02-03 && commit_all 2001-02-03'
+range=base..HEAD expect_finding 'a record added in the range another day' \
+  'docs/adr/2-b.md: date 2000-01-01 is not the entry day 2001-02-04' "$start" \
+  'write_record 1-a.md 2001-02-03 && commit_all 2001-02-03' \
+  'write_record 2-b.md 2000-01-01 && commit_all 2001-02-04'
+range=base..HEAD expect_finding 'a record fixed after the commit adding it' \
+  'docs/adr/1-a.md: date 2000-01-01 is not the entry day 2001-02-03' "$start" \
+  'write_record 1-a.md 2000-01-01 && commit_all 2001-02-03' \
+  'write_record 1-a.md 2001-02-03 && commit_all 2001-02-04'
+range=base..HEAD expect_clean 'a record added before the range' \
+  'write_record 1-a.md 2000-01-01 && commit_all 2001-02-01 && git tag base' \
+  'echo edit >> docs/adr/1-a.md && commit_all 2001-02-05'
+range=base..HEAD expect_clean 'a range ignores what is staged' "$start" \
+  'write_record 1-a.md 2000-01-01 && git add -A'
 
 if [ "$failures" -gt 0 ]; then exit 1; fi
