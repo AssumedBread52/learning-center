@@ -1,6 +1,6 @@
 ---
 title: GitHub Actions
-status: Implementing
+status: Implemented
 date: 2026-11-05
 area: process
 trigger: deliberate
